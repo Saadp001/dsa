@@ -1,250 +1,154 @@
-//Assignment no 4
-
-#include <iostream>
-#include <string.h>
-#define max 10
+#include<iostream>
+#include <string>
+#include<stack>
 using namespace std;
 
-class node
+// Node class representing a node in the expression tree
+class Node
 {
-     public:
-          char data;
-          node *left;
-          node *right;
+    char data;            // Character data (operand or operator)
+    Node* left;           // Left child
+    Node* right;          // Right child
+
+    // Constructor initializes node with character data
+    Node(char d) : data(d), left(NULL), right(NULL) {}
+
+    // Make ExpressionTree a friend class so it can access private members
+    friend class ExpressionTree;
 };
 
-class stack
+// ExpressionTree class for handling tree creation and traversal
+class ExpressionTree
 {
-     node *stk[max];
-     int top;
-     public:
-     stack()
-     {
-          top = -1;
-     }
-     int isempty();
-     int isfull();
-     void push(node *x);
-     node* pop();
-     void display();
-};
-class expr
-{
-     node* root;
-     public:
-     expr()
-     {
-          root = NULL;
-     }
-     node * getroot()
-     {
-       return(root);
-     }
-     void createexpr();
-     void inorder(node* root);
-};
-int stack :: isempty()
-{
-     if(top == -1)
-     {
-          return 1;
-     }
-     else
-     {
-          return 0;
-     }
-}
-int stack :: isfull()
-{
-     if(top == max-1)
-     {
-          return 1;
-     }
-     else
-     {
-          return 0;
-     }
-}
-void stack :: push(node *x)
-{
-     int c = isfull();
-     if(c != 1)
-     {
-          stk[++top] = x;
-     }
-     else
-     {
-          cout << "\nStack is full";
-     }
-}
+    Node* root;  // Root of the expression tree
 
-node*  stack :: pop()
-{
-     node *t;
-     int j = isempty();
-     if(j != 1)
-     {
-          t = stk[top];
-          return(stk[top--]);
-     }
-     else
-     {
-          return(NULL);
-     }
+public:
+    // Function to create expression tree from prefix expression
+    void createTree(string prefix)
+    {
+        int j = prefix.length() - 1; // Start from the end of the string
+        stack<Node*> st;
 
-}
-void stack :: display()
-{
-     for(int i=0; i<=top; i++)
-     {
-          cout << stk[i]->data << " ";
-     }
-}
-void expr :: createexpr()
-{
-     node* new1;
-     char str[15];
-     int length;
-     stack s;
-     cout << "\nEnter a prefix expression: ";
-     cin >> str;
-     length = strlen(str);
-     for(int i=length; i>0; i--)
-     {
-          new1 = new node;
-          new1->data = str[i];
-          new1->left = NULL;
-          new1->right = NULL;
-          if(new1->data == '+' || new1->data == '-' || new1->data == '*' || new1->data == '/' || new1->data == '%')
-          {
-              new1->left = s.pop();
-              new1->right = s.pop();
-              s.push(new1);
-          }
-          else
-          {
-              s.push(new1);
-          }
-     }
-     root = s.pop();
-}
-void expr :: inorder(node* root)
-{
-     if(root != NULL)
-     {
-          inorder(root->left);
-          cout << root->data;
-          inorder(root->right);
-     }
-}
+        while (j >= 0)
+        {
+            // If character is an operand (A-Z or a-z)
+            if (prefix[j] >= 65 && prefix[j] <= 90 || prefix[j] >= 97 && prefix[j] <= 122)
+            {
+                Node* newNode = new Node(prefix[j]); // Create a node for operand
+                st.push(newNode); // Push operand node to stack
+            }
+            // If character is an operator
+            else
+            {
+                Node* parent = new Node(prefix[j]); // Create node for operator
+
+                // Top of stack becomes left child (note: reversed due to prefix)
+                parent->left = st.top();
+                st.pop();
+
+                // Next top of stack becomes right child
+                parent->right = st.top();
+                st.pop();
+
+                // Push parent node back to stack
+                st.push(parent);
+            }
+            j--; // Move to the previous character in prefix
+        }
+
+        root = st.top(); // Root of the tree is at top of stack
+        st.pop();
+    }
+
+    // Getter function to access root of tree (used for recursive operations)
+    Node* getRoot()
+    {
+        return root;
+    }
+
+    // Non-recursive postorder traversal of expression tree
+    void postOrderNonRecursive()
+    {
+        stack<Node*> st;
+        Node* root = this->root;
+
+        while (root != NULL || !st.empty())
+        {
+            // Go to leftmost node while pushing right child first
+            while (root != NULL)
+            {
+                if (root->right)
+                    st.push(root->right);
+                st.push(root);
+                root = root->left;
+            }
+
+            root = st.top();
+            st.pop();
+
+            // If the right child is not yet visited
+            if (root->right && !st.empty() && st.top() == root->right)
+            {
+                Node* temp = st.top();
+                st.pop();
+                st.push(root);
+                root = temp; // Process right child
+            }
+            else
+            {
+                // Visit the node
+                cout << root->data << " ";
+                root = NULL; // Reset root to continue with top of stack
+            }
+        }
+    }
+
+    // Helper function to delete all nodes (used by destructor)
+    void delAllNodes(Node* root)
+    {
+        if (root)
+        {
+            delAllNodes(root->left);
+            delAllNodes(root->right);
+            delete root; // Delete current node
+        }
+    }
+
+    // Destructor to delete all dynamically created nodes
+    ~ExpressionTree()
+    {
+        cout << "Deleting all Nodes\n";
+        delAllNodes(root); // Free the memory
+    }
+};
+
 int main()
 {
-     int ch;
-     stack g;
-     expr e;
-     do
-     {
-          cout << "\n--------MENU-------";
-          cout << "\n1. Push";
-          cout << "\n2. Pop";
-          cout << "\n3. Display";
-          cout << "\n4. Expression Tree";
-          cout << "\n5. Exit";
-          cout << "\nEnter your choice: ";
-          cin >> ch;
-          switch(ch)
-          {
-              case 1:
-              node *nn;
-              nn = new node();
-              cout << "\nEnter element to push: ";
-              cin >> nn ->data;
-              g.push(nn);
-              break;
+    ExpressionTree exptree;
+    string prefix;
 
-              case 2:
-              node *t;
-              t = new node();
-              t = g.pop();
-              cout << "\nElement has been popped"<<t->data;
-              break;
+    cout << "Enter a Prefix Expression : ";
+    getline(cin, prefix); // Take prefix input (e.g., "*+AB-CD")
 
-              case 3:
-              g.display();
-              break;
-
-              case 4:
-              e.createexpr();
-              e.inorder(e.getroot());
-              break;
-
-              case 5:
-              exit(0);
-              break;
-
-              default:
-              cout << "\nInvalid choice entered";
-          }
-     }while(ch != 5);
-     return 0;
+    exptree.createTree(prefix); // Create expression tree from prefix
+    cout << "Postorder traversal (Non-recursive) : ";
+    exptree.postOrderNonRecursive(); // Perform non-recursive postorder traversal
 }
+/*Q: What is an expression tree?
+A: An expression tree is a binary tree where leaves are operands and internal nodes are operators, used to represent and evaluate expressions.
 
-output:
-gescoe@gescoe-OptiPlex-3010:~/Desktop/SE-A-45$ g++ expr_tree.cpp
-gescoe@gescoe-OptiPlex-3010:~/Desktop/SE-A-45$ ./a.out
+Q: Why do we construct the tree from the end of the prefix expression?
+A: In prefix notation, operators come before operands. So, to construct the tree properly, we process the expression from right to left.
 
---------MENU-------
-1. Push
-2. Pop
-3. Display
-4. Expression Tree
-5. Exit
-Enter your choice: 1
+Q: Why is a stack used in tree construction?
+A: Stack helps temporarily store operand nodes so that when an operator is encountered, we can pop two operands and assign them as children of the operator node.
 
-Enter element to push: 1
+Q: What is postorder traversal used for in expression trees?
+A: Postorder traversal is used to evaluate the expression as it visits the left subtree, right subtree, and then the operator (root).
 
---------MENU-------
-1. Push
-2. Pop
-3. Display
-4. Expression Tree
-5. Exit
-Enter your choice: 1
+Q: How is memory managed in this program?
+A: Dynamically created nodes are deleted using a recursive delAllNodes function called in the destructor.
 
-Enter element to push: 2
-
---------MENU-------
-1. Push
-2. Pop
-3. Display
-4. Expression Tree
-5. Exit
-Enter your choice: 2
-
-Element has been popped2
---------MENU-------
-1. Push
-2. Pop
-3. Display
-4. Expression Tree
-5. Exit
-Enter your choice: 3
-1
---------MENU-------
-1. Push
-2. Pop
-3. Display
-4. Expression Tree
-5. Exit
-Enter your choice: 4
-
-Enter a prefix expression: +--a*bc/def
-a-b*c-d/e
---------MENU-------
-1. Push
-2. Pop
-3. Display
-4. Expression Tree
-5. Exit
-Enter your choice: 5
-gescoe@gescoe-OptiPlex-3010:~/Desktop/SE-A-5$
+Q: What is the output of the traversal for the input *+AB-CD?
+A: The tree corresponds to the expression ((A + B) * (C - D)). Postorder traversal: A B + C D - *
+*/
