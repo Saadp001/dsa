@@ -1,692 +1,250 @@
-//Assignment no 2
 #include <iostream>
-#define max 20
 using namespace std;
 
-class set
+class Set
 {
-     int A[max], cnt;
-     public:
-     set()
-     {
-          for(int i=0; i<max; i++)
-          {
-              A[i] = '\0';
-          }
-          cnt = 0;
-     }
-     void insert(void);
-     void display(void);
-     int search(int);
-     void size(void);
-     void del(void);
-     void union1(set, set);
-     set union2(set);
-     void intersection(set, set);
-     void minus(set, set);
-     void subset(set, set);
-     void reset(void);
+    int arr[20], count; // Array to store set elements and a count to track the number of elements
+public:
+    Set()
+    {
+        count = 0; // Initialize count to 0
+    }
+
+    // Function to return the size of the set (number of elements)
+    void size()
+    {
+        cout << "Total Elements : " << count << endl;
+    }
+
+    // Function to add an element to the set
+    void addElement()
+    {
+        int key;
+        cout << "Enter element to Add : ";
+        cin >> key; // User inputs the element to be added
+        arr[count++] = key; // Add element to array and increment count
+    }
+
+    // Function to display the elements of the set
+    void display()
+    {
+        cout << "Set Elements" << endl;
+        for (int i = 0; i < count; i++)
+            cout << arr[i] << " "; // Display each element in the array
+        cout << endl;
+    }
+
+    // Function to search for an element in the set
+    int search(int key)
+    {
+        for (int i = 0; i < count; i++)
+            if (key == arr[i]) // If element found, return index
+                return i;
+        return -1; // If element not found, return -1
+    }
+
+    // Function to remove an element from the set
+    void remove()
+    {
+        int key;
+        cout << "Enter element to be deleted : ";
+        cin >> key; // User inputs element to be deleted
+        int index = search(key); // Search for element in the set
+        if (index != -1) // If element found, remove it
+        {
+            // Shift elements left to fill the gap after removal
+            for (int i = index; i < count - 1; i++)
+                arr[i] = arr[i + 1];
+            count--; // Decrease the count of elements in the set
+            cout << key << " deleted successfully" << endl;
+            return;
+        }
+        cout << "Element Not Found" << endl; // Element not found in the set
+    }
+
+    // Function to display the intersection of two sets
+    void intersection(Set B)
+    {
+        cout << "Intersection of sets" << endl;
+        for (int i = 0; i < this->count; i++) // Loop through set A
+            if (this->search(this->arr[i]) != -1 && B.search(this->arr[i]) != -1) // If element is in both sets
+                cout << arr[i] << " "; // Print common element
+        cout << endl;
+    }
+
+    // Function to display the union of two sets
+    void unionSet(Set B)
+    {
+        cout << "Union of sets" << endl;
+        for (int i = 0; i < count; i++) // Loop through set A and print elements
+            cout << arr[i] << " ";
+        for (int i = 0; i < B.count; i++) // Loop through set B and print elements not already in set A
+            if (this->search(B.arr[i]) == -1)
+                cout << B.arr[i] << " "; // Print unique elements from set B
+        cout << endl;
+    }
+
+    // Function to display the difference between two sets
+    void difference(Set B)
+    {
+        cout << "Difference of sets" << endl;
+        for (int i = 0; i < this->count; i++) // Loop through set A
+            if (B.search(arr[i]) == -1) // If element not found in set B, print it
+                cout << arr[i] << " ";
+        for (int i = 0; i < B.count; i++) // Loop through set B
+            if (this->search(B.arr[i]) == -1) // If element not found in set A, print it
+                cout << B.arr[i] << " ";
+        cout << endl;
+    }
+
+    // Function to check if set B is a subset of set A
+    void subset(Set B)
+    {
+        for (int i = 0; i < B.count; i++) // Loop through set B
+            if (this->search(B.arr[i]) == -1) // If any element of B is not in A, it's not a subset
+            {
+                cout << "No Subsets present" << endl;
+                return;
+            }
+        cout << "Subset is present" << endl; // All elements of B are found in A, so B is a subset of A
+    }
 };
-void set :: insert(void)
-{
-     int x;
-     cout << "\nEnter element to insert: ";
-     cin >> x;
-     A[cnt] = x;
-     cnt++;
-}
-void set :: display(void)
-{
-     cout << "\nSet contents are as follows...";
-     for(int i=0; i<cnt; i++)
-     {
-          cout << A[i] << " ";
-     }
-}
-void set :: size(void)
-{
-     cout << "\nThe size of the set is: " << cnt;
-}
-int set :: search(int x)
-{
-     for(int i=0; i<max; i++)
-     {
-          if(A[i] == x)
-          {
-              cout << "\nElement found...";
-              return i;
-          }
-     }
-     return -1;
-}
-void set :: del(void)
-{
-     int x, index;
-     cout << "\nEnter element to delete: ";
-     cin >> x;
-     index = search(x);
-     for(int i=index; i<max; i++)
-     {
-          A[i] = A[i+1];
-     }
-     cnt--;
-}
-void set :: union1(set m, set n)
-{
-     for(int i=0; i<m.cnt; i++)
-     {
-          A[i] = m.A[i];
-     }
-     cnt = m.cnt;
-     for(int i=0; i<n.cnt; i++)
-     {
-          if(search(n.A[i]) == -1)
-          {
-              A[cnt] = n.A[i];
-              cnt++;
-          }
-     }
-}
-set set :: union2(set k)
-{
-     set temp;
-     for(int i=0; i<cnt; i++)
-     {
-          temp.A[i] = A[i];
-     }
-     temp.cnt = cnt;
-     for(int i=0; i<k.cnt; i++)
-     {
-          if(search(k.A[i]) == -1)
-          {
-              temp.A[temp.cnt] = k.A[i];
-              temp.cnt++;
-          }
-     }
-     return temp;
-}
-void set :: intersection(set m, set n)
-{
-     for(int i=0; i<n.cnt; i++)
-     {
-          if(m.search(n.A[i]) != -1)
-          {
-              A[cnt] = n.A[i];
-              cnt++;
-          }
-     }
-}
-void set :: minus(set m, set n)
-{
-     for(int i=0; i<n.cnt; i++)
-     {
-          if(m.search(n.A[i]) == -1)
-          {
-              A[cnt] = n.A[i];
-              cnt++;
-          }
-     }
-}
-void set :: subset(set m, set n)
-{
-     int scnt = 0;
-     for(int i=0; i<n.cnt; i++)
-     {
-          if(m.search(n.A[i]) != -1)
-          {
-              scnt++;
-          }
-     }
-     if(scnt == n.cnt)
-     {
-          cout << "\nB is a subset of A";
-     }
-     else
-     {
-          cout << "\nB is not a subset of A";
-     }
-}
-void set :: reset(void)
-{
-     for(int i=0; i<cnt; i++)
-     {
-          A[i] = '\0';
-     }
-     cnt = 0;
-}
+
 int main()
 {
-     set s, a, b;
-     int ch;
-     do
-     {
-          cout << "\n-------MENU-------";
-          cout << "\n1. Insert SET";
-          cout << "\n2. Insert A";
-          cout << "\n3. Insert B";
-          cout << "\n4. Display";
-          cout << "\n5. Size";
-          cout << "\n6. Search";
-          cout << "\n7. Delete";
-          cout << "\n8. Union 1";
-          cout << "\n9. Intersection";
-          cout << "\n10. Minus (A-B)";
-          cout << "\n11. Minus(B-A)";
-          cout << "\n12. Subset";
-          cout << "\n13. Reset";
-          cout << "\n14. Exit";
-          cout << "\nEnter your choice: ";
-          cin >> ch;
+    Set A, B; // Declare two set objects A and B
+    int choice, key, num;
+    bool flag = true;
 
-          switch(ch)
-          {
-              case 1:
-              s.insert();
-              break;
-
-              case 2:
-a. insert();
-              break;
-
-              case 3:
-b. insert();
-              break;
-
-              case 4:
-              s.display();
-a. display();
-b. display();
-              break;
-
-              case 5:
-              s.size();
-a. size();
-b. size();
-              break;
-
-              case 6:
-              int x;
-              cout << "\nEnter element to search: ";
-              cin >> x;
-              s.search(x);
-              break;
-
-              case 7:
-              s.del();
-              break;
-
-              case 8:
-              s.union1(a, b);
-              break;
-
-              case 9:
-              s.intersection(a, b);
-              break;
-
-              case 10:
-              s.minus(a, b);
-              break;
-
-              case 11:
-              s.minus(b, a);
-              break;
-
-              case 12:
-              s.subset(a, b);
-              break;
-
-              case 13:
-              s.reset();
-a. reset();
-b. reset();
-              break;
-
-              case 14:
-              exit(0);
-              break;
-
-              default:
-              cout << "\nInvalid choice entered...";
-          }
-     }while(ch != 14);
-     return 0;
+    // Menu-driven program to interact with the user and perform set operations
+    while (flag)
+    {
+        cout << "*************MENU*************" << endl;
+        cout << "1. Add Element" << endl;
+        cout << "2. Remove Element" << endl;
+        cout << "3. Search" << endl;
+        cout << "4. Size of Set" << endl;
+        cout << "5. Intersection" << endl;
+        cout << "6. Union" << endl;
+        cout << "7. Difference" << endl;
+        cout << "8. Subset" << endl;
+        cout << "9. Display" << endl;
+        cout << "10. Exit" << endl;
+        cout << "Enter your choice : ";
+        cin >> choice; // User selects the operation
+        switch (choice)
+        {
+            case 1: // Add element to the set
+                cout << "Choose Set" << endl;
+                cout << "1. A\n2. B" << endl;
+                cout << "Enter your choice : ";
+                cin >> choice; // User selects the set (A or B)
+                switch (choice)
+                {
+                    case 1: // Add element to set A
+                        A.addElement();
+                        break;
+                    case 2: // Add element to set B
+                        B.addElement();
+                        break;
+                    default:
+                        cout << "Invalid Choice" << endl; // Invalid set choice
+                }
+                break;
+            case 2: // Remove element from the set
+                cout << "Choose Set" << endl;
+                cout << "1. A\n2. B" << endl;
+                cout << "Enter your choice : ";
+                cin >> choice; // User selects the set (A or B)
+                switch (choice)
+                {
+                    case 1: // Remove element from set A
+                        A.remove();
+                        break;
+                    case 2: // Remove element from set B
+                        B.remove();
+                        break;
+                    default:
+                        cout << "Invalid Choice" << endl; // Invalid set choice
+                }
+                break;
+            case 3: // Search for an element in the set
+                int key;
+                cout << "Enter element to be searched : ";
+                cin >> key; // User inputs element to search
+                cout << "Choose Set" << endl;
+                cout << "1. A\n2. B" << endl;
+                cout << "Enter your choice : ";
+                cin >> choice; // User selects the set (A or B)
+                switch (choice)
+                {
+                    case 1: // Search in set A
+                        num = A.search(key);
+                        break;
+                    case 2: // Search in set B
+                        num = B.search(key);
+                        break;
+                    default:
+                        cout << "Invalid Choice" << endl; // Invalid set choice
+                }
+                if (num != -1)
+                    cout << key << " found at index " << num << endl; // Element found
+                else
+                    cout << key << " not found" << endl; // Element not found
+                break;
+            case 4: // Display size of the set
+                cout << "Choose Set" << endl;
+                cout << "1. A\n2. B" << endl;
+                cout << "Enter your choice : ";
+                cin >> choice; // User selects the set (A or B)
+                switch (choice)
+                {
+                    case 1: // Display size of set A
+                        A.size();
+                        break;
+                    case 2: // Display size of set B
+                        B.size();
+                        break;
+                    default:
+                        cout << "Invalid Choice" << endl; // Invalid set choice
+                }
+                break;
+            case 5: // Perform intersection of sets
+                A.intersection(B);
+                break;
+            case 6: // Perform union of sets
+                A.unionSet(B);
+                break;
+            case 7: // Perform difference of sets
+                A.difference(B);
+                break;
+            case 8: // Check if set B is a subset of set A
+                A.subset(B);
+                break;
+            case 9: // Display elements of the set
+                cout << "Choose Set" << endl;
+                cout << "1. A\n2. B" << endl;
+                cout << "Enter your choice : ";
+                cin >> choice; // User selects the set (A or B)
+                switch (choice)
+                {
+                    case 1: // Display elements of set A
+                        A.display();
+                        break;
+                    case 2: // Display elements of set B
+                        B.display();
+                        break;
+                    default:
+                        cout << "Invalid Choice" << endl; // Invalid set choice
+                }
+                break;
+            case 10: // Exit the program
+                cout << "End of Program" << endl;
+                flag = false; // Exit the loop and end the program
+                break;
+            default:
+                cout << "Invalid Choice" << endl; // Invalid menu choice
+        }
+    }
+    return 0;
 }
-
-output:
-gescoe@gescoe-OptiPlex-3010:~/Desktop/SE-A-45$ g++ set.cpp
-gescoe@gescoe-OptiPlex-3010:~/Desktop/SE-A-45$ ./a.out
-
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 1
-
-Enter element to insert: 1
-
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 1
-
-Enter element to insert: 2
-
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 1
-
-Enter element to insert: 3
-
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 2
-
-Enter element to insert: 1
-
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 2
-
-Enter element to insert: 2
-
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 1
-
-Enter element to insert: 4
-
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 3
-
-Enter element to insert: 6
-
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 3
-
-Enter element to insert: 7
-
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 3
-
-Enter element to insert: 8
-
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 5
-
-The size of the set is: 4
-The size of the set is: 2
-The size of the set is: 3
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 7
-
-Enter element to delete: 2
-
-Element found...
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 8
-
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 4
-
-Set contents are as follows...1 2 6 7 8
-Set contents are as follows...1 2
-Set contents are as follows...6 7 8
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 13
-
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 2
-
-Enter element to insert: 1
-
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 2
-
-Enter element to insert: 2
-
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 3
-
-Enter element to insert: 2
-
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 9
-
-Element found...
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 4
-
-Set contents are as follows...2
-Set contents are as follows...1 2
-Set contents are as follows...2
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 10
-
-Element found...
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 4
-
-Set contents are as follows...2
-Set contents are as follows...1 2
-Set contents are as follows...2
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 12
-
-Element found...
-B is a subset of A
--------MENU-------
-1. Insert SET
-2. Insert A
-3. Insert B
-4. Display
-5. Size
-6. Search
-7. Delete
-8. Union 1
-9. Intersection
-10. Minus (A-B)
-11. Minus(B-A)
-12. Subset
-13. Reset
-14. Exit
-Enter your choice: 14
-gescoe@gescoe-OptiPlex-3010:~/Desktop/SE-A-5$
