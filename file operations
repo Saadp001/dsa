@@ -1,245 +1,142 @@
-//Assignment no 11
-
-#include<iostream>
-#include<fstream>
-#include<string.h>
+#include<iostream>         // For standard I/O
+#include<fstream>          // For file handling (ifstream, ofstream, fstream)
+#include<cstring>          // For string operations like strcpy
 using namespace std;
 
-struct stud
-{
-     int roll;
-     char name[10];
-     char div;
-     char add[10];
-}rec;
+// Structure to store student information
+struct Student {
+    int roll;
+    char name[20];
+    char div;
+    char address[50];
+} rec;
 
-
-class student
-{
-     public:
-     void create();
-     void display();
-     int search();
-     void Delete();
+// Class containing functions to manage student records
+class StudentManager {
+public:
+    void create();
+    void display();
+    int search(int);       // Modified to take roll number as parameter
+    void remove();         // Renamed Delete to remove to avoid conflict with keyword
 };
 
-void student::create()
- {
-     char ans;
-     ofstream fout;
-     fout.open("stud.dat",ios::out|ios::binary);
-     do
-     {
-          cout<<"\n\tEnter Roll No of Student : ";
-          cin>>rec.roll;
-          cout<<"\n\tEnter a Name of Student : ";
-          cin>>rec.name;
-          cout<<"\n\tEnter a Division of Student : ";
-          cin>>rec.div;
-          cout<<"\n\tEnter a Address of Student : ";
-          cin>>rec.add;
-          fout.write((char *)&rec,sizeof(stud))<<flush;
-          cout<<"\n\tDo You Want to Add More Records: ";
-          cin>>ans;
-     }while(ans=='y'||ans=='Y');
-     fout.close();
+void StudentManager::create() {
+    char ans;
+    ofstream fout("stud.dat", ios::out | ios::binary);  // Create (or overwrite) the file
+
+    do {
+        cout << "\nEnter Roll No of Student: ";
+        cin >> rec.roll;
+        cout << "Enter Name of Student: ";
+        cin >> rec.name;
+        cout << "Enter Division: ";
+        cin >> rec.div;
+        cout << "Enter Address: ";
+        cin >> rec.address;
+
+        fout.write((char*)&rec, sizeof(Student));       // Write binary data to file
+
+        cout << "Do you want to add more records? (y/n): ";
+        cin >> ans;
+    } while (ans == 'y' || ans == 'Y');
+
+    fout.close();     // Close the file
 }
 
-void student::display()
-{
-     ifstream fin;
-     fin.open("stud.dat",ios::in|ios::binary);
-     fin.seekg(0,ios::beg);
-     cout<<"\n\tThe Content of File are:\n";
-     cout<<"\n\tRoll\tName\tDiv\tAddress";
-     while(fin.read((char *)&rec,sizeof(stud)))
-     {
-          if(rec.roll!=-1)
-          cout<<"\n\t"<<rec.roll<<"\t"<<rec.name<<"\t"<<rec.div<<"\t"<<rec.add;
+void StudentManager::display() {
+    ifstream fin("stud.dat", ios::in | ios::binary);    // Open file in read mode
 
-     }
-          fin.close();
+    cout << "\n--- Student Records ---";
+    cout << "\nRoll\tName\tDiv\tAddress\n";
+
+    while (fin.read((char*)&rec, sizeof(Student))) {
+        if (rec.roll != -1) {   // Skip logically deleted records
+            cout << rec.roll << "\t" << rec.name << "\t" << rec.div << "\t" << rec.address << endl;
+        }
+    }
+
+    fin.close();
 }
 
-int student::search()
-{
-     int r,i=0;
-     ifstream fin;
-     fin.open("stud.dat",ios::in|ios::binary);
-     fin.seekg(0,ios::beg);
-     cout<<"\n\tEnter a Roll No: ";
-     cin>>r;
+int StudentManager::search(int roll_no) {
+    ifstream fin("stud.dat", ios::in | ios::binary);
+    int pos = 0;
 
-     while(fin.read((char *)&rec,sizeof(stud)))
-     {
-          if(rec.roll==r)
-          {
-              cout<<"\n\tRecord Found...\n";
-              cout<<"\n\tRoll\tName\tDiv\tAddress";
-              cout<<"\n\t"<<rec.roll<<"\t"<<rec.name<<"\t"<<rec.div<<"\t"<<rec.add;
-              return i;
-          }
-          i++;
-     }
-     fin.close();
-     return 0;
+    while (fin.read((char*)&rec, sizeof(Student))) {
+        if (rec.roll == roll_no) {
+            cout << "\nRecord Found:";
+            cout << "\nRoll\tName\tDiv\tAddress\n";
+            cout << rec.roll << "\t" << rec.name << "\t" << rec.div << "\t" << rec.address << endl;
+            fin.close();
+            return pos;   // Return the position in the file
+        }
+        pos++;
+    }
+
+    fin.close();
+    cout << "\nRecord not found.";
+    return -1;     // Return -1 if not found
 }
 
-void student::Delete()
-{
-     int pos;
-     pos=search();
-     fstream f;
-     f.open("stud.dat",ios::in|ios::out|ios::binary);
-     f.seekg(0,ios::beg);
-     if(pos==0)
-     {
-          cout<<"\n\tRecord Not Found";
-          return;
-     }
-     int offset=pos*sizeof(stud);
-     f.seekp(offset);
-     rec.roll=-1;
-     strcpy(rec.name,"NULL");
-     rec.div='N';
-     strcpy(rec.add,"NULL");
-     f.write((char *)&rec,sizeof(stud));
-     f.seekg(0);
-     f.close();
-     cout<<"\n\tRecord Deleted";
- }
+void StudentManager::remove() {
+    int roll_no;
+    cout << "Enter the Roll No to delete: ";
+    cin >> roll_no;
 
-int main()
-{
-        student obj;
-        int ch,key;
-        char ans;
-        do
-        {
-                 cout<<"\n\t***** Student Information *****";
-                 cout<<"\n\t1. Create\n\t2. Display\n\t3. Delete\n\t4.  Search\n\t5. Exit";
-                 cout<<"\n\t..... Enter Your Choice: ";
-                 cin>>ch;
-                 switch(ch)
-                 {
-                 case 1: obj.create();
-                 break;
-                 case 2: obj.display();
-                 break;
-                 case 3: obj.Delete();
-                 break;
-                 case 4: key=obj.search();
-                 break;
-                 case 5:
-                 break;
-                 }
-                 cout<<"\n\t..... Do You Want to Continue in Main Menu: "; cin>>ans;
-        }while(ans=='y'||ans=='Y');
+    int pos = search(roll_no);
+    if (pos == -1) {
+        cout << "Cannot delete. Record does not exist.\n";
+        return;
+    }
 
-return 1;
- }
+    fstream f("stud.dat", ios::in | ios::out | ios::binary);
+    int offset = pos * sizeof(Student);
+    f.seekp(offset);   // Move to the position of the record to be deleted
 
-output:
-gescoe@gescoe-OptiPlex-3010:~/Desktop/SE-A-45$ g++ file_11.cpp
-gescoe@gescoe-OptiPlex-3010:~/Desktop/SE-A-45$ ./a.out
+    rec.roll = -1;
+    strcpy(rec.name, "NULL");
+    rec.div = 'N';
+    strcpy(rec.address, "NULL");
 
-     	***** Student Information *****
-     	1. Create
-     	2. Display
-     	3. Delete
-     	4.  Search
-     	5. Exit
-     	..... Enter Your Choice: 1
+    f.write((char*)&rec, sizeof(Student));    // Overwrite the record
+    f.close();
 
-     	Enter Roll No of Student : 66
+    cout << "Record deleted successfully.\n";
+}
 
-     	Enter a Name of Student : krushna
+int main() {
+    StudentManager manager;
+    int choice, roll;
+    char again;
 
-     	Enter a Division of Student : A
+    do {
+        cout << "\n----- Student Information System -----";
+        cout << "\n1. Create Records";
+        cout << "\n2. Display Records";
+        cout << "\n3. Delete Record";
+        cout << "\n4. Search Record";
+        cout << "\n5. Exit";
+        cout << "\nEnter your choice: ";
+        cin >> choice;
 
-     	Enter a Address of Student : 812
+        switch (choice) {
+        case 1: manager.create(); break;
+        case 2: manager.display(); break;
+        case 3: manager.remove(); break;
+        case 4:
+            cout << "Enter Roll No to Search: ";
+            cin >> roll;
+            manager.search(roll);
+            break;
+        case 5: return 0;
+        default: cout << "Invalid choice. Try again.\n";
+        }
 
-     	Do You Want to Add More Records: y
+        cout << "Do you want to continue? (y/n): ";
+        cin >> again;
 
-     	Enter Roll No of Student : 55
+    } while (again == 'y' || again == 'Y');
 
-     	Enter a Name of Student : Asmit
-
-     	Enter a Division of Student : A
-
-     	Enter a Address of Student : 50
-
-     	Do You Want to Add More Records: y
-
-     	Enter Roll No of Student : 47
-
-     	Enter a Name of Student : Aditi
-
-     	Enter a Division of Student : A
-
-     	Enter a Address of Student : 11
-
-     	Do You Want to Add More Records: n
-
-     	..... Do You Want to Continue in Main Menu: y
-
-     	***** Student Information *****
-     	1. Create
-     	2. Display
-     	3. Delete
-     	4.  Search
-     	5. Exit
-     	..... Enter Your Choice: 2
-
-     	The Content of File are:
-
-     	Roll	Name	Div	Address
-     	66	krushna	A	812
-     	55	Asmit	A	50
-     	47	Aditi	A	11
-     	..... Do You Want to Continue in Main Menu: y
-
-     	***** Student Information *****
-     	1. Create
-     	2. Display
-     	3. Delete
-     	4.  Search
-     	5. Exit
-     	..... Enter Your Choice: 3
-
-     	Enter a Roll No: 66
-
-     	Record Found...
-
-     	Roll	Name	Div	Address
-     	66	krushna	A	812
-     	Record Not Found
-     	..... Do You Want to Continue in Main Menu: y
-
-     	***** Student Information *****
-     	1. Create
-     	2. Display
-     	3. Delete
-     	4.  Search
-     	5. Exit
-     	..... Enter Your Choice: 4
-
-     	Enter a Roll No: 55
-
-     	Record Found...
-
-     	Roll	Name	Div	Address
-     	55	Asmit	A	50
-     	..... Do You Want to Continue in Main Menu: y
-
-     	***** Student Information *****
-     	1. Create
-     	2. Display
-     	3. Delete
-     	4.  Search
-     	5. Exit
-     	..... Enter Your Choice: 5
-
-     	..... Do You Want to Continue in Main Menu: n
-gescoe@gescoe-OptiPlex-3010:~/Desktop/SE-A-5$
+    return 0;
+}
 
