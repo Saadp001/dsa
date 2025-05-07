@@ -1,128 +1,120 @@
-//Assignment no 12
-
 import java.util.Scanner;
-class MergeSort
-{
 
-  // Merge two subarrays L and M into arr
-  void merge(int arr[], int p, int q, int r)
-    {
-     int n1 = q - p + 1;
-     int n2 = r - q;
-     int L[] = new int[n1];
-     int M[] = new int[n2];
+class MergeSort {
 
-     for (int i = 0; i < n1; i++)
-       L[i] = arr[p + i];
-     for (int j = 0; j < n2; j++)
-       M[j] = arr[q + 1 + j];
+    // Function to merge two halves of the array
+    void merge(int arr[], int left, int mid, int right) {
+        // Sizes of the two subarrays
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
 
-     // Maintain current index of sub-arrays and main array
-     int i, j, k;
-     i = 0;
-     j = 0;
-     k = p;
+        // Temporary arrays to hold the left and right halves
+        int[] L = new int[n1];
+        int[] R = new int[n2];
 
-     // Until we reach either end of either L or M, pick larger among
-     // elements L and M and place them in the correct position at A[p..r]
-     while (i < n1 && j < n2)
-     {
-       if (L[i] <= M[j])
-       {
-          arr[k] = L[i];
-          i++;
-       } else
-       {
-          arr[k] = M[j];
-          j++;
-       }
-       k++;
-     }
+        // Copy data into temporary arrays
+        for (int i = 0; i < n1; i++)
+            L[i] = arr[left + i];
+        for (int j = 0; j < n2; j++)
+            R[j] = arr[mid + 1 + j];
 
-     // When we run out of elements in either L or M,
-     // pick up the remaining elements and put in A[p..r]
-     while (i < n1)
-     {
-       arr[k] = L[i];
-       i++;
-       k++;
-     }
+        // Indexes for left (L), right (R), and merged array
+        int i = 0, j = 0, k = left;
 
-     while (j < n2)
-     {
-       arr[k] = M[j];
-       j++;
-       k++;
-     }
-  }
+        // Merge the two arrays by comparing elements
+        while (i < n1 && j < n2) {
+            if (L[i] <= R[j]) {
+                arr[k] = L[i];
+                i++;
+            } else {
+                arr[k] = R[j];
+                j++;
+            }
+            k++;
+        }
 
-  // Divide the array into two subarrays, sort them and merge them
-  void mergeSort(int arr[], int l, int r)
-    {
-      if (l < r)
-      {
+        // Copy any remaining elements from L[]
+        while (i < n1) {
+            arr[k] = L[i];
+            i++;
+            k++;
+        }
 
-       // m is the point where the array is divided into two subarrays
-       int m = (l + r) / 2;
+        // Copy any remaining elements from R[]
+        while (j < n2) {
+            arr[k] = R[j];
+            j++;
+            k++;
+        }
+    }
 
-       mergeSort(arr, l, m);
-       mergeSort(arr, m + 1, r);
+    // Function to recursively divide and sort the array
+    void mergeSort(int arr[], int left, int right) {
+        if (left < right) {
+            // Find the middle point
+            int mid = (left + right) / 2;
 
-       // Merge the sorted subarrays
-       merge(arr, l, m, r);
-     }
-  }
+            // Sort the first and second halves
+            mergeSort(arr, left, mid);
+            mergeSort(arr, mid + 1, right);
 
-  // Print the array
-  static void printArray(int arr[])
-  {
-     int n = arr.length;
-     for (int i = 0; i < n; ++i)
-       System.out.print(arr[i] + " ");
-     System.out.println();
-  }
-     // Driver program
-  public static void main(String args[]) {
+            // Merge the sorted halves
+            merge(arr, left, mid, right);
+        }
+    }
 
-int n;
-          Scanner sc=new Scanner(System.in);
-          System.out.print("Enter the number of elements you want to store: ");
-          //reading the number of elements from the that we want to enter
-          n=sc.nextInt();
+    // Function to print the array
+    static void printArray(int arr[]) {
+        for (int value : arr)
+            System.out.print(value + " ");
+        System.out.println();
+    }
 
-          int[] arr = new int[n];
-          System.out.println("Enter the elements of the array: ");
-          for(int i=0; i<n; i++)
-          {
-          //reading array elements from the user
-              arr[i]=sc.nextInt();
+    // Main method
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        // Take input for array size
+        System.out.print("Enter number of elements: ");
+        int n = sc.nextInt();
+
+        int[] arr = new int[n];
+
+        // Input array elements
+        System.out.println("Enter the elements:");
+        for (int i = 0; i < n; i++) {
+            arr[i] = sc.nextInt();
+        }
+
+        // Show array before sorting
+        System.out.println("Before sorting:");
+        printArray(arr);
+
+        // Call merge sort
+        MergeSort obj = new MergeSort();
+        obj.mergeSort(arr, 0, n - 1);
+
+        // Show sorted array
+        System.out.println("After sorting:");
+        printArray(arr);
+    }
 }
-    System.out.println("Enter Array before sorting");
+/*
+What is Merge Sort?
+Merge Sort is a Divide and Conquer algorithm that splits the array into halves, sorts them, and then merges the sorted parts.
 
+Time Complexity:
 
-System.out.println("Array before sorting");
-printArray(arr);
-     MergeSort ob = new MergeSort();
-     ob.mergeSort(arr, 0, arr.length - 1);
+Best, Average, Worst: O(n log n)
 
-     System.out.println("Sorted array:");
-     printArray(arr);
-  }
-}
+It divides n elements log(n) times and merges them in linear time.
 
-output:
-gescoe@gescoe-OptiPlex-3010:~/Desktop/SE-A-45$ javac MergeSort.java
-gescoe@gescoe-OptiPlex-3010:~/Desktop/SE-A-45$ java MergeSort
-Enter the number of elements you want to store: 5
-Enter the elements of the array:
-6
-3
-7
-2
-5
-Enter Array before sorting
-Array before sorting
-6 3 7 2 5
-Sorted array:
-2 3 5 6 7
-gescoe@gescoe-OptiPlex-3010:~/Desktop/SE-A-5$
+Why use Merge Sort?
+
+It's stable and has guaranteed time complexity.
+
+Good for linked lists and large datasets.
+
+Space Complexity:
+O(n) because of temporary arrays used in merging.
+*/
