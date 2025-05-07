@@ -1,187 +1,183 @@
-//Assignment no 1
-
 #include <iostream>
+#include <iomanip>
 using namespace std;
 
-class HashTable{
-
-public:
-int key;
-int index;
-
-};
-
+// Hashing class for managing the hash table and performing operations.
 class Hashing
 {
- private:
- HashTable H[10];
- public:
+    long long* hashTable;  // Pointer to the dynamically allocated hash table.
+    int size;               // Size of the hash table.
+    
+    public:
+        // Function to create and initialize the hash table.
+        void createTable()
+        {
+            cout << "Enter size of Hash Table: ";
+            cin >> size;  // User provides the size of the hash table (e.g., 10).
+            hashTable = new long long[size];  // Dynamically allocating memory for the hash table.
+            
+            // Initialize all entries in the hash table to -1 to indicate empty slots.
+            for(int i = 0; i < size; i++)
+                hashTable[i] = -1;
+                
+            cout << "Hash Table Created Successfully!" << endl;
+        }
 
- Hashing(){
+        // Function to insert a mobile number into the hash table.
+        void insertNumber()
+        {
+            long long mobile;
+            int index;
+            
+            cout << "Enter mobile number: ";
+            cin >> mobile;  // User inputs a mobile number.
+            
+            // Hash the mobile number to find the index in the table.
+            index = mobile % size;
+            
+            // If the slot is empty, directly store the number.
+            if(hashTable[index] == -1)
+            {
+                hashTable[index] = mobile;
+                cout << "Number stored at index " << index << endl;
+            }
+            else
+            {
+                // If collision occurs, ask the user for the collision resolution method.
+                cout << "Collision Occurred!" << endl;
+                cout << "1. Linear Probing" << endl;
+                cout << "2. Quadratic Probing" << endl;
+                cout << "Enter your choice : ";
+                int choice;
+                cin >> choice;
+                
+                // Call the appropriate collision handling method.
+                switch(choice)
+                {
+                    case 1:
+                        cout << "Collision handling using Linear Probing" << endl;
+                        linearProbing(mobile, index);  // Handle collision using Linear Probing.
+                        break;
+                    case 2:
+                        cout << "Collision handling using Quadratic Probing" << endl;
+                        quadraticProbing(mobile, index);  // Handle collision using Quadratic Probing.
+                        break;
+                    default:
+                        cout << "Invalid Choice!" << endl;  // If the user inputs an invalid choice.
+                }
+            }
+        }
 
- for(int i=0;i<10;i++)
- {
- H[i].key=-1;
- H[i].index=i;
- }
- }
+        // Function to handle collisions using Linear Probing.
+        void linearProbing(long long mobile, int index)
+        {
+            // Try to find the next available index by sequentially checking the next slots.
+            for(int i = (index+1)%size, count = 0; count < size; i++, count++)
+            {
+                if(hashTable[i] == -1)
+                {
+                    hashTable[i] = mobile;  // Store the mobile number at the found position.
+                    cout << "Number stored at index " << i << " using linear probing" << endl;
+                    break;
+                }
+                if(i == size - 1)  // If we reach the last index, wrap around to the start.
+                    i = -1;
+            }
+        }
 
-  void display();
-  void insert(int p_ch);
-  int LinearP(int position);
-  int QuadraticP(int position);
+        // Function to handle collisions using Quadratic Probing.
+        void quadraticProbing(long long mobile, int index)
+        {
+            int newIndex;
+            
+            // Quadratic probing tries different positions based on the formula: (index + i^2) % size.
+            for(int i = 0; i < size; i++)
+            {
+                newIndex = (index + i*i) % size;
+                if(hashTable[newIndex] == -1)
+                {
+                    hashTable[newIndex] = mobile;  // Store the mobile number at the found position.
+                    cout << "Number stored at index " << newIndex << " using quadratic probing" << endl;
+                    break;
+                }
+            }
+        }
+
+        // Function to display all the elements in the hash table.
+        void displayHashTable()
+        {
+            cout << "Hash Table Elements" << endl;
+            for(int i = 0; i < size; i++)
+            {
+                // Print the index and the stored mobile number.
+                std::printf("%2d. ", i+1);
+                cout << hashTable[i] << endl;
+            }
+        }
+
+        // Function to search for a mobile number in the hash table.
+        void search()
+        {
+            long long mob;
+            cout << "Enter Mobile Number to search : "; 
+            cin >> mob;  // User inputs the mobile number to search for.
+            
+            // Traverse the hash table to find the mobile number.
+            for(int i = 0; i < size; i++)
+            {
+                if(hashTable[i] == mob)
+                {
+                    cout << "Found at index : " << i << endl;
+                    return;  // Exit the function once the mobile number is found.
+                }
+            }
+            
+            // If the number is not found in the table.
+            cout << "Mobile Number not found" << endl;
+        }
 };
 
-void Hashing::display()
+// Main function with menu-driven options for the user.
+int main()
 {
-  cout<<"Hash Table is"<<endl;
-  for(int i=0;i<10;i++)
-  {
-     cout<<H[i].key<<"\t\t\t\t\t"<<H[i].index<<endl;
+    Hashing ht;  // Create an object of the Hashing class.
+    bool flag = true;
+    
+    // Menu loop to provide options to the user.
+    while(flag)
+    {
+        cout << "***********Menu***********" << endl;
+        cout << "1. Create Hash Table" << endl;
+        cout << "2. Insert Mobile Number" << endl;
+        cout << "3. Display Hash Table" << endl;
+        cout << "4. Search Mobile Number" << endl;
+        cout << "5. Exit" << endl;
 
-  }
-
+        cout << "Enter your choice : ";
+        int choice;
+        cin >> choice;
+        
+        // Switch case to handle different operations based on the user's choice.
+        switch(choice)
+        {
+            case 1:
+                ht.createTable();  // Create the hash table.
+                break;
+            case 2:
+                ht.insertNumber();  // Insert a mobile number into the hash table.
+                break;
+            case 3:
+                ht.displayHashTable();  // Display the current state of the hash table.
+                break;
+            case 4:
+                ht.search();  // Search for a mobile number in the hash table.
+                break;
+            case 5:
+                cout << "End of Program" << endl;
+                flag = false;  // Exit the loop and end the program.
+                break;
+            default:
+                cout << "Invalid Choice!" << endl;  // If the user enters an invalid choice.
+        }
+    }
 }
-
-void Hashing::insert(int p_ch)
-{
- int pos;
- int key1;
-
- cout<<"Enter the Telephone number\n";
- cin>>key1;
- pos=key1%10;
-
- if(H[pos].key==-1)
- {
-  H[pos].key=key1;
- }
- else if(p_ch==1){
- int temp=LinearP(pos);
- H[temp].key=key1;
- }
- else if(p_ch==2){
- int temp=QuadraticP(pos);
- H[temp].key=key1;
- }
-}
-
-int Hashing::LinearP(int position) {
-     for (int i = 0; i < 10; i++) {
-          int newPos = (position + i) % 10;
-          if (H[newPos].key == -1) {
-              return newPos;
-          }
-     }
-     return -1;
-}
-
-
-int Hashing::QuadraticP(int position) {
-     for (int i = 0; i < 10; i++) {
-          int newPos = (position + (i * i)) % 10;
-          if (H[newPos].key == -1) {
-              return newPos;
-          }
-     }	
-     return -1;
-}
-
-
-int main(){
-
-Hashing obj;
-int ch;
-int p_choice;
-
-do{
-  cout<<"----MENU----\n";
-  cout<<"1. Insert\n";
-  cout<<"2. Display\n";
-  cout<<"3. Exit\n";
-  cout<<"Enter your choice\n";
-  cin>>ch;
-  if(ch==1){
-  cout<<"Enter the probing choice\n1. Linear Probing\n2. Quadratic Probing\n";
-  cin>>p_choice;
-  }
-  else{
-  p_choice=0;
-  }
-  switch(ch){
-  case 1:
-  {
-    obj.insert(p_choice);
-    break;
-  }
-  case 2:
-  {
-  obj.display();
-  break;
-  }
-  case 3:
-  {
-       cout<<"End of program";
-       break;
-  }
-  default:
-  {
-  cout<<"Enter valid choice :\n";
-  }
-  }
-
-}while(ch!=3);
-
-}
-
-output:
-gescoe@gescoe-OptiPlex-3010:~/Desktop/SE-A-45$ g++ Hashing.cpp
-gescoe@gescoe-OptiPlex-3010:~/Desktop/SE-A-45$ ./a.out
-----MENU----
-1. Insert
-2. Display
-3. Exit
-Enter your choice
-1
-Enter the probing choice
-1. Linear Probing
-2. Quadratic Probing
-1
-Enter the Telephone number
-951878884
-----MENU----
-1. Insert
-2. Display
-3. Exit
-Enter your choice
-1
-Enter the probing choice
-1. Linear Probing
-2. Quadratic Probing
-2
-Enter the Telephone number
-976700110
-----MENU----
-1. Insert
-2. Display
-3. Exit
-Enter your choice
-2
-Hash Table is
-976700110					
-- 1					
-- 1					
-- 1					
-951878884					
-- 1					
-- 1					
-- 1					
-- 1					
-- 1					
-----MENU----
-1. Insert
-2. Display
-3. Exit
-Enter your choice
-3
-End of programgescoe@gescoe-OptiPlex-3010:~/Desktop/SE-A-5$
