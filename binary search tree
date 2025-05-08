@@ -201,6 +201,8 @@ int main() {
 
     return 0;
 }
+Best/Average case: O(log n) — for balanced trees
+Worst case: O(n) — for skewed trees (like a linked list)
 /*Q: What is a mirror of a tree?
 A: A mirror swaps left and right pointers of all nodes in the tree recursively.
 
