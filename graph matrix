@@ -1,263 +1,208 @@
-//Assignment no 6
+/*---------------------------------------------------
+Pr no : 06
+Title : Represent a given graph using adjacency matrix/list to perform DFS and using adjacency list to perform BFS. Use the map of the area around the college as the graph. Identify the prominent landmarks as nodes and perform DFS and BFS on that.
+-----------------------------------------------------*/
 
-#include <iostream>
+#include<iostream>
 using namespace std;
-class graph
-{
- public:
-  int vcnt,rcnt;
-  int a[20][20];
-  int v[20];
 
-  graph()
-  {
-    vcnt=0;
-    rcnt=0;
-  }
-  void admat();
-  void dis_admat();
-  void bfs();
-  void dfs();
-  int search(int key);
-};
-
-
-void graph::admat()
-{
- cout<<"Enter total no. of vertices:";
- cin>>vcnt;
- for(int i=1;i<=vcnt;i++)
- {
-  for(int j=1;j<=vcnt;j++)
-  {
-    cout<<"Edge from "<<i<<" to "<<j<<":";
-    cin>>a[i][j];
-  }
- }
-}
-
-
-void graph::dis_admat()
-{
- for(int i=1;i<=vcnt;i++)
- {
-  for(int j=1;j<=vcnt;j++)
-  {
-    cout<<a[i][j]<<" ";
-  }
-  cout<<endl;
- }
-}
-
-
-class queue
-{
+// Class for representing the graph using an adjacency matrix
+class graph {
+    int a[10][10];    // Adjacency matrix
+    int vcnt;         // Number of vertices
+    int Rcnt;         // Result counter for visited vertices
+    int v[20];        // Stores visited vertices
 public:
- int q[20];
- int front,rear;
- queue()
- {
-  front=0;
-  rear=0;
- }
- void insert(int key);
- int del();
+    graph() {
+        Rcnt = 0;
+        vcnt = 0;
+    }
+
+    void read_adjacency();       // Read adjacency matrix
+    void display_adjacency();    // Display adjacency matrix
+    void BFS();                  // Breadth-First Search
+    void DFS();                  // Depth-First Search
+    int search(int);             // Search if a vertex is already visited
 };
 
-
-void queue::insert(int key)
-{
- if(rear<20)
- {
-  q[rear++]=key;
- }
- else
- {
-  cout<<"Queue is full."<<endl;
- }
+// Reads the adjacency matrix from user input
+void graph::read_adjacency() {
+    cout << "Enter vertex count: ";
+    cin >> vcnt;
+    for (int i = 1; i <= vcnt; i++) {
+        for (int j = 1; j <= vcnt; j++) {
+            cout << "Enter edge " << i << " to " << j << ": ";
+            cin >> a[i][j];   // 1 if edge exists, else 0
+        }
+    }
 }
 
-
-int queue::del()
-{
- if(front!=rear)
- {
-  return(q[front++]);
- }
- else
- {
-  cout<<"Queue is empty."<<endl;\
-  return -1;
- }
+// Displays the adjacency matrix
+void graph::display_adjacency() {
+    cout << "Adjacency Matrix:\n";
+    for (int i = 1; i <= vcnt; i++) {
+        for (int j = 1; j <= vcnt; j++) {
+            cout << a[i][j] << "  ";
+        }
+        cout << "\n";
+    }
 }
 
+// Queue class for BFS implementation
+class Queue {
+    int a[20];
+    int f, r;   // Front and rear pointers
+public:
+    Queue() {
+        f = 0;
+        r = 0;
+    }
 
-class stack
-{
- public:
-  int s[20];
-  int top;
-  stack()
-  {
-    top=-1;
-  }
-  void push(int key);
-  int pop();
+    void insert(int key);  // Enqueue
+    int Delete();          // Dequeue
 };
 
-
-void stack::push(int key)
-{
- if(top<=20)
- {
-  s[++top]=key;
- }
- else
- {
-  cout<<"Stack is full."<<endl;
- }
+void Queue::insert(int key) {
+    if (r != 20) {
+        a[r++] = key;
+    } else {
+        cout << "Queue is full ";
+    }
 }
 
-
-int stack::pop()
-{
- if(top!=-1)
- {
-  return s[top--];
- }
- else
- {
-  cout<<"Stack is empty."<<endl;
-  return -1;
- }
+int Queue::Delete() {
+    if (f != r) {
+        return a[f++];
+    } else {
+        cout << "Queue is Empty ";
+        return -1;  // Return dummy value if empty
+    }
 }
 
+// Stack class for DFS implementation
+class stack {
+    int a[20];
+    int top;
+public:
+    stack() {
+        top = -1;
+    }
 
-int graph::search(int key)
-{
- //search val in visited array. if val is already present return 1 else return 0
- int i;
- for(i=0;i<rcnt;i++)
- {
-  if(v[i]==key)
-  {
-    return (1);
-  }
- }
- if(i==rcnt)
- {
-  return (0);
- }
- return -1;
+    void push(int key);  // Push onto stack
+    int pop();           // Pop from stack
+};
+
+void stack::push(int key) {
+    if (top != 19) {
+        a[++top] = key;
+    } else {
+        cout << "Stack is full ";
+    }
 }
 
-void graph::bfs()
-{
- int sv,curr;   //sv= start vertex
- cout<<"Enter start vertex:";
- cin>>sv;
- v[rcnt++]=sv;
- queue q;
- q.insert(sv);
- for(int i=1;i<=vcnt;i++)
- {
-  curr=q.del();  //curr will store the value at the front of queue
-  for(int c=1;c<=vcnt;c++)
-  {
-    if(a[curr][c]==1)   //check for the adjacent vertice of curr
-    {
-     q.insert(c);   //insert adjacent vertices of curr in the queue
-     if(search(c)==0)
-     {
-      v[rcnt++]=c;
-     }
+int stack::pop() {
+    if (top != -1) {
+        return a[top--];
+    } else {
+        cout << "Stack is Empty ";
+        return -1;  // Return dummy value if empty
     }
-  }
- }
- cout<<"BFS:";
- for(int i=0;i<rcnt;i++)
- {
-  cout<<v[i]<<" ";
- }
- cout<<endl;
 }
 
-
-void graph::dfs()
-{
- int sv,curr;   //sv= start vertex
- cout<<"Enter start vertex:";
- cin>>sv;
- v[rcnt++]=sv;
- stack s;
- s.push(sv);
- for(int i=1;i<=vcnt;i++)
- {
-  curr=s.pop();  //curr will store the value at the front of queue
-  for(int c=1;c<=vcnt;c++)
-  {
-    if(a[curr][c]==1)   //check for the adjacent vertice of curr
-    {
-     s.push(c);   //insert adjacent vertices of curr in the queue
-     if(search(c)==0)
-     {
-      v[rcnt++]=c;
-     }
+// Checks if a vertex has already been visited
+int graph::search(int key) {
+    for (int i = 0; i < Rcnt; i++) {
+        if (v[i] == key) {
+            return 1;  // Found
+        }
     }
-  }
- }
- cout<<"DFS:";
- for(int i=0;i<rcnt;i++)
- {
-  cout<<v[i]<<" ";
- }
- cout<<endl;
+    return 0;  // Not found
 }
 
+// Breadth-First Search implementation
+void graph::BFS() {
+    Rcnt = 0;  // Reset visited
+    int sv, curr;
+    cout << "Enter starting vertex: ";
+    cin >> sv;
+    v[Rcnt++] = sv;  // Mark starting vertex as visited
 
-int main()
-{
- graph g;
- int ch;
- do{
-  cout<<"---MENU---\n";
-  cout<<"1.Insert Matrix\n";
-  cout<<"2.Display Matrix\n";
-  cout<<"3.BFS\n";
-  cout<<"4.DFS\n";
-  cout<<"5.Exit\n";
-  cout<<"Enter your choice\n";
-  cin>>ch;
-  switch(ch){
-    case 1:
-    {
-      g.admat();
-      break;
+    Queue q;
+    q.insert(sv);    // Enqueue starting vertex
+
+    for (int i = 1; i <= vcnt; i++) {
+        curr = q.Delete();  // Dequeue current vertex
+
+        // Explore all adjacent vertices
+        for (int c = 1; c <= vcnt; c++) {
+            if (a[curr][c] == 1 && search(c) == 0) {
+                q.insert(c);       // Enqueue unvisited adjacent
+                v[Rcnt++] = c;     // Mark as visited
+            }
+        }
     }
-    case 2:
-    {
-           		 g.dis_admat();
-           		 break;
+
+    // Print BFS traversal result
+    cout << "BFS = ";
+    for (int i = 0; i < Rcnt; i++) {
+        cout << " " << v[i];
     }
-    case 3:
-    {
-           		 g.bfs();
-           		 break;
+    cout << endl;
+}
+
+// Depth-First Search implementation
+void graph::DFS() {
+    Rcnt = 0;  // Reset visited
+    int sv, curr;
+    cout << "Enter starting vertex: ";
+    cin >> sv;
+    v[Rcnt++] = sv;  // Mark starting vertex as visited
+
+    stack s;
+    s.push(sv);  // Push starting vertex onto stack
+
+    for (int i = 1; i <= vcnt; i++) {
+        curr = s.pop();  // Pop current vertex
+
+        // Explore all adjacent vertices
+        for (int c = 1; c <= vcnt; c++) {
+            if (a[curr][c] == 1 && search(c) == 0) {
+                s.push(c);        // Push unvisited adjacent
+                v[Rcnt++] = c;    // Mark as visited
+            }
+        }
     }
-    case 4:
-    {
-           		 g.dfs();
-           		 break;
+
+    // Print DFS traversal result
+    cout << "DFS = ";
+    for (int i = 0; i < Rcnt; i++) {
+        cout << " " << v[i];
     }
-    case 5:
-    {
-           		 cout<<"End of the program";
-           		 break;
-    }
-    default:
-      cout<<"Invalid choice!";
-    }
-  }while(ch!=5);
+    cout << endl;
+}
+
+// Main function to run the program
+int main() {
+    int choice;
+    graph obj;
+
+    obj.read_adjacency();       // Step 1: Input graph
+    obj.display_adjacency();    // Step 2: Show adjacency matrix
+
+    // Menu-driven choice for BFS or DFS
+    do {
+        cout << "\nMenu\n1. BFS\n2. DFS\n3. Exit\nEnter choice: ";
+        cin >> choice;
+        switch (choice) {
+            case 1:
+                obj.BFS();
+                break;
+            case 2:
+                obj.DFS();
+                break;
+        }
+    } while (choice != 3);  // Exit condition
+
     return 0;
 }
 
@@ -357,3 +302,14 @@ Enter your choice
 Enter your choice
 5
 End of the programgescoe@gescoe-OptiPlex-3010:~/Desktop/SE-A-5$
+
+/*What is BFS?: Level-wise traversal using a queue.
+
+What is DFS?: Depth-wise traversal using a stack (or recursion).
+
+Why use search()?: To avoid visiting the same node again.
+
+Why adjacency matrix?: Easy to check if an edge exists between any two vertices.
+
+Limitations: Fixed size arrays, no edge weights, not efficient for sparse graphs.*/
+
