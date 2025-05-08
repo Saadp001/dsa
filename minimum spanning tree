@@ -138,6 +138,7 @@ A: It helps us pick the minimum weight edge quickly at each step (this is actual
 
 Q: How many edges are in an MST for V vertices?
 A: Always V - 1 edges.
+Kruskal’s adds minimum weight edges globally; Prim’s grows a tree from one vertex using the lowest-cost edge connecting it.
 */
 
 
