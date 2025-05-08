@@ -139,6 +139,32 @@ A: It helps us pick the minimum weight edge quickly at each step (this is actual
 Q: How many edges are in an MST for V vertices?
 A: Always V - 1 edges.
 Kruskal’s adds minimum weight edges globally; Prim’s grows a tree from one vertex using the lowest-cost edge connecting it.
+Prim’s (Simple Array)	O(V²) Small or dense graphs
+Kruskal’s  O(E log V)	Graphs with more vertices and fewer edges
+
+ What is the purpose of the bsort() function?
+A: It sorts the edges in ascending order of their weights using Bubble Sort. This helps to select the smallest available edge first (greedy strategy).
+
+void kruskal() {
+    for (int i = 0; i < 26; i++) parent[i] = -1;
+
+    m = 0; // number of edges in MST
+    for (int i = 0; i < n; i++) {
+        int u = arr[i].u1 - 'A';
+        int v = arr[i].u2 - 'A';
+
+        int pu = find(u);
+        int pv = find(v);
+
+        if (pu != pv) {
+            res[m++] = arr[i]; // add edge to MST
+            Union(pu, pv);     // merge sets
+        }
+
+        if (m == x - 1) break; // MST is ready
+    }
+}
+
 */
 
 
